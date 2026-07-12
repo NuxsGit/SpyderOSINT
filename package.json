@@ -1,0 +1,26 @@
+{
+  "name": "spyderosint",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "arctic": "^3.7.0",
+    "argon2": "^0.44.0",
+    "astro": "^7.0.7",
+    "better-sqlite3": "^12.11.1",
+    "oslo": "^1.2.1"
+  },
+  "allowScripts": {
+    "argon2@0.44.0": true,
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.1": true
+  }
+}

@@ -1,0 +1,1302 @@
+---
+// src/pages/index.astro
+// Spyder OSINT — Page d'accueil
+// Stack : Astro SSR, vanilla JS, zéro dépendance frontend
+---
+
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Spyder OSINT — Moteur d'investigation numérique</title>
+        <meta
+            name="description"
+            content="Plateforme d'investigation OSINT. Analysez emails, IPs, pseudos, Discord IDs et adresses en temps réel."
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+
+    <body>
+        <!-- ░░ GLOW CURSEUR ░░ -->
+        <div id="cursor-glow" aria-hidden="true"></div>
+
+        <!-- ░░ GRILLE DE FOND ░░ -->
+        <div class="bg-grid" aria-hidden="true"></div>
+
+        <!-- ════════════════════════════════════════════
+       NAVBAR
+  ════════════════════════════════════════════ -->
+        <nav class="navbar">
+            <div class="nav-logo">
+                <img src="/Spyder.png" alt="Logo" />
+                <span class="logo-wordmark">SPYDER<em>OSINT</em></span>
+            </div>
+
+            <ul class="nav-links" role="list">
+                <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+                <li><a href="#modules">Modules</a></li>
+                <li><a href="#tarifs">Tarifs</a></li>
+                <li><a href="#docs">Docs</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="/login" class="btn-ghost">Connexion</a>
+                <a href="/register" class="btn-primary">Commencer</a>
+            </div>
+
+            <!-- Burger mobile -->
+            <button
+                class="burger"
+                id="burger"
+                aria-label="Menu"
+                aria-expanded="false"
+            >
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+            <a href="#fonctionnalites">Fonctionnalités</a>
+            <a href="#modules">Modules</a>
+            <a href="#tarifs">Tarifs</a>
+            <a href="/login">Connexion</a>
+            <a href="/register" class="btn-primary">Commencer</a>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════ -->
+        <main>
+            <section class="hero" aria-labelledby="hero-title">
+                <div class="hero-badge">
+                    <span class="badge-dot" aria-hidden="true"></span>
+                    Plateforme d'investigation OSINT open-source
+                </div>
+
+                <!-- Illustration centrale araignée / toile -->
+                <div class="hero-illustration" aria-hidden="true">
+                    <img src="/Spyder.png" alt="Logo" class="hero-logo" />
+                </div>
+
+                <h1 id="hero-title" class="hero-title">
+                    Investiguez.<br />
+                    <span class="title-accent">Tout.</span> Maintenant.
+                </h1>
+
+                <p class="hero-sub">
+                    Spyder OSINT détecte automatiquement le type de donnée que
+                    vous saisissez et lance les modules d'investigation
+                    correspondants en temps réel. Email, IP, pseudo, Discord ID,
+                    adresse physique — un seul champ suffit.
+                </p>
+
+                <!-- ── Barre de recherche ── -->
+                <div class="search-wrapper" role="search">
+                    <div class="search-box" id="search-box">
+                        <span class="search-icon" aria-hidden="true">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 18 18"
+                                fill="none"
+                            >
+                                <circle
+                                    cx="7.5"
+                                    cy="7.5"
+                                    r="5.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"></circle>
+                                <line
+                                    x1="11.5"
+                                    y1="11.5"
+                                    x2="16"
+                                    y2="16"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"></line>
+                            </svg>
+                        </span>
+                        <input
+                            id="search-input"
+                            type="text"
+                            placeholder="john@gmail.com  ·  192.168.1.1  ·  @pseudo  ·  123456789012345"
+                            autocomplete="off"
+                            spellcheck="false"
+                            aria-label="Saisir une donnée à investiguer"
+                        />
+                        <div
+                            class="search-type-indicator"
+                            id="type-indicator"
+                            aria-live="polite"
+                        >
+                            <span id="type-label">—</span>
+                        </div>
+                        <button
+                            class="search-btn"
+                            id="search-btn"
+                            aria-label="Lancer l'analyse"
+                        >
+                            Analyser
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M2 7h10M8 3l4 4-4 4"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Pills de type -->
+                    <div
+                        class="type-pills"
+                        role="group"
+                        aria-label="Type d'input"
+                    >
+                        <button class="pill" data-type="email">
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="1"
+                                    y="2.5"
+                                    width="10"
+                                    height="7"
+                                    rx="1"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"></rect>
+                                <path
+                                    d="M1 4l5 3.5L11 4"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"></path>
+                            </svg>
+                            Email
+                        </button>
+                        <button class="pill" data-type="username">
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="6"
+                                    cy="4"
+                                    r="2.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"></circle>
+                                <path
+                                    d="M1.5 10.5c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"
+                                    stroke-linecap="round"></path>
+                            </svg>
+                            Username
+                        </button>
+                        <button class="pill" data-type="discord_id">
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M4 2C2.5 2.5 1.5 4 1.5 6c0 2 1 3.5 2.5 4l.5-1C3 8.5 2.5 7.5 2.5 6S3 3.5 4 3l-.5-1H4z"
+                                    fill="currentColor"
+                                    opacity=".6"></path>
+                                <path
+                                    d="M8 2l-.5 1C8.5 3.5 9 4.5 9 6s-.5 2.5-1.5 3l.5 1C9.5 9.5 10.5 8 10.5 6c0-2-1-3.5-2.5-4z"
+                                    fill="currentColor"
+                                    opacity=".6"></path>
+                                <circle
+                                    cx="6"
+                                    cy="6"
+                                    r="1.5"
+                                    fill="currentColor"></circle>
+                            </svg>
+                            Discord ID
+                        </button>
+                        <button class="pill" data-type="ip">
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="6"
+                                    cy="6"
+                                    r="4.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"></circle>
+                                <path
+                                    d="M6 1.5V6l3 1.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"
+                                    stroke-linecap="round"></path>
+                            </svg>
+                            IP
+                        </button>
+                        <button class="pill" data-type="phone">
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="3"
+                                    y="1"
+                                    width="6"
+                                    height="10"
+                                    rx="1"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"></rect>
+                                <circle
+                                    cx="6"
+                                    cy="9.5"
+                                    r=".6"
+                                    fill="currentColor"></circle>
+                            </svg>
+                            Téléphone
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Stats ── -->
+                <div
+                    class="hero-stats"
+                    aria-label="Statistiques de la plateforme"
+                >
+                    <div class="stat-item">
+                        <span class="stat-num">+500</span>
+                        <span class="stat-label">Plateformes</span>
+                    </div>
+                    <div class="stat-sep" aria-hidden="true"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">12</span>
+                        <span class="stat-label">Modules actifs</span>
+                    </div>
+                    <div class="stat-sep" aria-hidden="true"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">100%</span>
+                        <span class="stat-label">Gratuit</span>
+                    </div>
+                    <div class="stat-sep" aria-hidden="true"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">0</span>
+                        <span class="stat-label">Logs stockés</span>
+                    </div>
+                    <div class="stat-sep" aria-hidden="true"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">SSE</span>
+                        <span class="stat-label">Résultats live</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ════════════════════════════════════════════
+         SECTION MODULES
+    ════════════════════════════════════════════ -->
+            <section
+                class="modules-section"
+                id="modules"
+                aria-labelledby="modules-title"
+            >
+                <div class="section-eyebrow">// modules disponibles</div>
+                <h2 id="modules-title" class="section-title">
+                    Un input.<br />Cinq vecteurs d'analyse.
+                </h2>
+
+                <div class="modules-grid">
+                    <article class="module-card mc-email">
+                        <div class="mc-icon" aria-hidden="true">✉</div>
+                        <h3 class="mc-name">Email</h3>
+                        <p class="mc-desc">
+                            Fuites (HIBP), comptes tiers (Holehe), profil Google
+                            et Gravatar.
+                        </p>
+                        <ul class="mc-tags" aria-label="Services utilisés">
+                            <li>HIBP</li><li>Holehe</li><li>Gravatar</li><li>
+                                Google
+                            </li>
+                        </ul>
+                    </article>
+
+                    <article class="module-card mc-ip">
+                        <div class="mc-icon" aria-hidden="true">⬡</div>
+                        <h3 class="mc-name">Adresse IP</h3>
+                        <p class="mc-desc">
+                            Géolocalisation, ASN, scan historique Shodan,
+                            blacklists.
+                        </p>
+                        <ul class="mc-tags" aria-label="Services utilisés">
+                            <li>ip-api</li><li>Shodan</li><li>Censys</li><li>
+                                AbuseIPDB
+                            </li>
+                        </ul>
+                    </article>
+
+                    <article class="module-card mc-user">
+                        <div class="mc-icon" aria-hidden="true">@</div>
+                        <h3 class="mc-name">Username</h3>
+                        <p class="mc-desc">
+                            Détection de présence sur +500 plateformes, dorks
+                            Google ciblés.
+                        </p>
+                        <ul class="mc-tags" aria-label="Services utilisés">
+                            <li>Sherlock</li><li>WhatsMyName</li><li>Dorks</li>
+                        </ul>
+                    </article>
+
+                    <article class="module-card mc-discord">
+                        <div class="mc-icon" aria-hidden="true">#</div>
+                        <h3 class="mc-name">Discord ID</h3>
+                        <p class="mc-desc">
+                            Décodage Snowflake, avatar, bannière, historique de
+                            pseudos.
+                        </p>
+                        <ul class="mc-tags" aria-label="Services utilisés">
+                            <li>Snowflake</li><li>DiscordLookup</li>
+                        </ul>
+                    </article>
+
+                    <article class="module-card mc-address">
+                        <div class="mc-icon" aria-hidden="true">◈</div>
+                        <h3 class="mc-name">Adresse</h3>
+                        <p class="mc-desc">
+                            Cartographie OSM, dorks voisinage, entreprises
+                            locales.
+                        </p>
+                        <ul class="mc-tags" aria-label="Services utilisés">
+                            <li>OpenStreetMap</li><li>Nominatim</li><li>
+                                Dorks
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <!-- ════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════ -->
+        <footer class="footer">
+            <div class="footer-left">
+                <span class="logo-wordmark" style="font-size:13px"
+                    >SPYDER<em>OSINT</em></span
+                >
+                <span class="footer-copy"
+                    >Usage éthique et légal uniquement.</span
+                >
+            </div>
+            <div class="footer-right">
+                <a href="/docs">Docs</a>
+                <a href="/legal">Mentions légales</a>
+                <a href="https://github.com" target="_blank" rel="noopener"
+                    >GitHub</a
+                >
+            </div>
+        </footer>
+    </body>
+</html>
+
+<!-- ════════════════════════════════════════════
+     STYLES
+════════════════════════════════════════════ -->
+<style is:global>
+    /* ── Reset & Tokens ── */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        /* Tokens Monochrome & Cyber-Minimalist */
+        --accent: #ffffff;
+        --accent-hover: #e0e0e0;
+        --yellow: var(
+            --accent
+        ); /* Alias pour compatibilité avec le HTML existant */
+
+        --black: #030303;
+        --white: #ffffff;
+
+        --gray-1: #0a0a0a;
+        --gray-2: #101010;
+        --gray-3: #161616;
+        --gray-4: #222222;
+        --gray-5: #555555;
+        --gray-6: #888888;
+
+        --border: rgba(255, 255, 255, 0.07);
+        --border-s: rgba(255, 255, 255, 0.14);
+
+        --dot: "Share Tech Mono", monospace;
+        --sans: "Space Grotesk", system-ui, sans-serif;
+        --radius: 8px;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--sans);
+        background: var(--black);
+        color: var(--white);
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Glow curseur (Lueur blanche subtile) ── */
+    #cursor-glow {
+        pointer-events: none;
+        position: fixed;
+        width: 650px;
+        height: 650px;
+        border-radius: 50%;
+        background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.04) 0%,
+            transparent 65%
+        );
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        z-index: 0;
+        will-change: top, left;
+        transition:
+            top 0.05s linear,
+            left 0.05s linear;
+    }
+
+    /* ── Grille de fond (Grid technique sombre) ── */
+    .bg-grid {
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.02) 1px,
+                transparent 1px
+            );
+        background-size: 50px 50px;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        padding: 0 40px;
+        height: 64px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(3, 3, 3, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    img {
+        width: 50px;
+        height: 50px;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+    }
+
+    .logo-wordmark {
+        font-family: var(--dot);
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        color: var(--white);
+        font-weight: 600;
+    }
+
+    .logo-wordmark em {
+        font-style: normal;
+        background: var(--white);
+        color: var(--black);
+        padding: 1px 6px;
+        margin-left: 4px;
+        border-radius: 2px;
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 4px;
+        margin-left: 12px;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 6px 14px;
+        font-size: 13px;
+        color: var(--gray-6);
+        text-decoration: none;
+        border-radius: var(--radius);
+        transition:
+            color 0.15s,
+            background 0.15s;
+    }
+
+    .nav-links a:hover {
+        color: var(--white);
+        background: var(--gray-3);
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
+    }
+
+    .btn-ghost {
+        padding: 7px 16px;
+        font-size: 13px;
+        color: var(--gray-6);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            color 0.15s,
+            border-color 0.15s;
+    }
+    .btn-ghost:hover {
+        color: var(--white);
+        border-color: var(--border-s);
+    }
+
+    /* Bouton principal blanc avec texte noir (Style SeekNow) */
+    .btn-primary {
+        padding: 7px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--black);
+        background: var(--white);
+        border: 1px solid var(--white);
+        border-radius: var(--radius);
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            background 0.15s,
+            transform 0.1s,
+            box-shadow 0.15s;
+    }
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        border-color: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .burger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        margin-left: auto;
+    }
+    .burger span {
+        display: block;
+        width: 22px;
+        height: 1.5px;
+        background: var(--white);
+        transition: 0.2s;
+    }
+
+    .mobile-menu {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--gray-1);
+        border-bottom: 1px solid var(--border);
+        z-index: 99;
+        padding: 12px 0;
+    }
+    .mobile-menu a {
+        display: block;
+        padding: 12px 28px;
+        color: var(--gray-6);
+        text-decoration: none;
+        font-size: 15px;
+        border-bottom: 1px solid var(--border);
+        transition: color 0.15s;
+    }
+    .mobile-menu a:hover {
+        color: var(--white);
+    }
+    .mobile-menu.open {
+        display: flex;
+    }
+
+    /* ── Hero ── */
+    main {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 64px 24px 80px;
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    /* Badge Hero sombre et discret */
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--gray-6);
+        background: var(--gray-2);
+        border: 1px solid var(--border-s);
+        border-radius: 100px;
+        padding: 6px 16px;
+        margin-bottom: 36px;
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--white);
+        box-shadow: 0 0 6px var(--white);
+        opacity: 0.8;
+    }
+
+    /* Illustration avec lueur blanche néon */
+    .hero-illustration {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto 36px;
+        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.15));
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+
+    .hero-title {
+        font-family: var(--sans);
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        color: var(--white);
+        margin-bottom: 16px;
+    }
+
+    .title-accent {
+        color: var(--white);
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0.3);
+        text-underline-offset: 6px;
+    }
+
+    .hero-sub {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--gray-6);
+        max-width: 580px;
+        margin: 0 auto 40px;
+        font-weight: 300;
+    }
+
+    /* ── Barre de recherche (Style SeekNow) ── */
+    .search-wrapper {
+        width: 100%;
+        max-width: 680px;
+        margin-bottom: 48px;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: #0b0b0b;
+        border: 1px solid var(--border-s);
+        border-radius: 12px;
+        padding: 6px 6px 6px 16px;
+        transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
+        margin-bottom: 16px;
+    }
+
+    .search-box:focus-within {
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    }
+
+    .search-icon {
+        color: var(--gray-5);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        margin-right: 12px;
+    }
+
+    #search-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-family: var(--sans);
+        font-size: 14px;
+        color: var(--white);
+        min-width: 0;
+    }
+
+    #search-input::placeholder {
+        color: var(--gray-5);
+    }
+
+    .search-type-indicator {
+        flex-shrink: 0;
+        font-family: var(--dot);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        color: var(--white);
+        background: var(--gray-3);
+        border: 1px solid var(--border-s);
+        border-radius: 6px;
+        padding: 4px 10px;
+        margin-right: 10px;
+        min-width: 56px;
+        text-align: center;
+    }
+
+    /* Bouton "Rechercher ➔" en blanc massif */
+    .search-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--white);
+        color: var(--black);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 22px;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition:
+            background 0.15s,
+            transform 0.1s;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+    }
+    .search-btn:active {
+        transform: translateY(0);
+    }
+    .search-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Pills de sélection */
+    .type-pills {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--gray-6);
+        background: var(--gray-1);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 6px 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .pill:hover {
+        color: var(--white);
+        border-color: var(--border-s);
+        background: var(--gray-2);
+    }
+
+    .pill.active {
+        color: var(--black);
+        background: var(--white);
+        border-color: var(--white);
+        font-weight: 500;
+    }
+
+    /* ── Stats (Alignement horizontal pur) ── */
+    .hero-stats {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 800px;
+        margin-top: 20px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+        padding: 12px 0;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 36px;
+        gap: 6px;
+    }
+
+    .stat-sep {
+        width: 1px;
+        height: 36px;
+        background: var(--border);
+        flex-shrink: 0;
+    }
+
+    .stat-num {
+        font-family: var(--sans);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--white);
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--gray-6);
+        white-space: nowrap;
+    }
+
+    /* ── Modules section ── */
+    .modules-section {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 80px 24px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .section-eyebrow {
+        font-family: var(--dot);
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        color: var(--gray-6);
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .section-title {
+        font-family: var(--sans);
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 500;
+        color: var(--white);
+        line-height: 1.2;
+        margin-bottom: 48px;
+    }
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .module-card {
+        background: var(--gray-1);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px 20px;
+        transition:
+            border-color 0.2s,
+            transform 0.2s,
+            box-shadow 0.2s;
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Lueur interne monochromatique au survol des cartes */
+    .module-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border-radius: inherit;
+        background: radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.05),
+            transparent 70%
+        );
+    }
+
+    .module-card:hover {
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .module-card:hover::before {
+        opacity: 1;
+    }
+
+    .mc-icon {
+        font-size: 20px;
+        margin-bottom: 16px;
+        display: block;
+        font-style: normal;
+        line-height: 1;
+        color: var(--white);
+    }
+
+    .mc-name {
+        font-family: var(--sans);
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--white);
+        margin-bottom: 8px;
+    }
+
+    .mc-desc {
+        font-size: 13px;
+        color: var(--gray-6);
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .mc-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        list-style: none;
+    }
+
+    .mc-tags li {
+        font-family: var(--dot);
+        font-size: 10px;
+        color: var(--gray-5);
+        background: var(--gray-2);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 3px 8px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 24px 40px;
+        border-top: 1px solid var(--border);
+        background: var(--black);
+        position: relative;
+        z-index: 1;
+    }
+
+    .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .footer-copy {
+        font-size: 12px;
+        color: var(--gray-5);
+    }
+
+    .footer-right {
+        display: flex;
+        gap: 24px;
+    }
+
+    .footer-right a {
+        font-size: 12px;
+        color: var(--gray-5);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+
+    .footer-right a:hover {
+        color: var(--white);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 0 20px;
+        }
+        .nav-links,
+        .nav-actions {
+            display: none;
+        }
+        .burger {
+            display: flex;
+        }
+        .hero {
+            padding: 40px 20px 60px;
+        }
+        .stat-item {
+            padding: 14px 20px;
+        }
+        .stat-sep {
+            display: none;
+        }
+        .hero-stats {
+            gap: 8px;
+        }
+        .footer {
+            padding: 20px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    /* ── Accessibilité ── */
+    :focus-visible {
+        outline: 2px solid var(--white);
+        outline-offset: 2px;
+    }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .hero-logo {
+        width: 200px;
+        height: 200px;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+    }
+</style>
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════ -->
+<script>
+    // ── Glow curseur ──────────────────────────────────────────────
+    const glow = document.getElementById("cursor-glow");
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let glowX = mouseX;
+    let glowY = mouseY;
+
+    document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    // Lerp fluide pour éviter les saccades
+    function lerpGlow() {
+        glowX += (mouseX - glowX) * 0.06;
+        glowY += (mouseY - glowY) * 0.06;
+        if (glow) {
+            glow.style.left = glowX + "px";
+            glow.style.top = glowY + "px";
+        }
+        requestAnimationFrame(lerpGlow);
+    }
+    lerpGlow();
+
+    // ── Détection de type en live ──────────────────────────────────
+    const PATTERNS = {
+        email: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/,
+        ip: /^(\d{1,3}\.){3}\d{1,3}$|^[\da-fA-F:]{3,39}$/,
+        discord_id: /^\d{17,19}$/,
+        phone: /^(\+?\d[\s\-.]?){7,14}\d$/,
+        username: /^[a-zA-Z0-9._\-]{2,50}$/,
+    };
+
+    const LABELS = {
+        email: "EMAIL",
+        ip: "IP ADDR.",
+        discord_id: "DISCORD",
+        phone: "PHONE",
+        username: "USERNAME",
+    };
+
+    const searchInput = document.getElementById("search-input");
+    const typeLabel = document.getElementById("type-label");
+    const typeIndicator = document.getElementById("type-indicator");
+    const pills = document.querySelectorAll(".pill");
+
+    function detectType(value) {
+        if (!value.trim()) return null;
+        for (const [type, pattern] of Object.entries(PATTERNS)) {
+            if (pattern.test(value.trim())) return type;
+        }
+        return "username";
+    }
+
+    function updatePill(type) {
+        pills.forEach((p) => {
+            p.classList.toggle("active", p.dataset.type === type);
+        });
+        if (type && LABELS[type]) {
+            typeLabel.textContent = LABELS[type];
+            typeIndicator.style.opacity = "1";
+        } else {
+            typeLabel.textContent = "—";
+            typeIndicator.style.opacity = "0.4";
+        }
+    }
+
+    searchInput?.addEventListener("input", (e) => {
+        const type = detectType(e.target.value);
+        updatePill(type);
+    });
+
+    // Clic sur une pill → injecter un exemple
+    const EXAMPLES = {
+        email: "john.doe@gmail.com",
+        username: "j0hn_d03",
+        discord_id: "123456789012345678",
+        ip: "185.220.101.47",
+        phone: "+33 6 12 34 56 78",
+    };
+
+    pills.forEach((pill) => {
+        pill.addEventListener("click", () => {
+            const type = pill.dataset.type;
+            if (searchInput) searchInput.value = EXAMPLES[type] ?? "";
+            updatePill(type);
+            searchInput?.focus();
+        });
+    });
+
+    // ── Soumission ─────────────────────────────────────────────────
+    const searchBtn = document.getElementById("search-btn");
+
+    async function handleSearch() {
+        const query = searchInput?.value.trim();
+        if (!query) {
+            searchInput?.focus();
+            return;
+        }
+
+        searchBtn.disabled = true;
+        searchBtn.textContent = "Analyse…";
+
+        try {
+            const res = await fetch("/api/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error ?? "Erreur serveur.");
+                return;
+            }
+
+            const params = new URLSearchParams({
+                q: query,
+                type: data.type,
+                stream: data.streamUrl,
+            });
+            window.location.href = `/results/${encodeURIComponent(query)}?${params}`;
+        } catch {
+            alert("Impossible de contacter le serveur.");
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.textContent = "Analyser";
+        }
+    }
+
+    searchBtn?.addEventListener("click", handleSearch);
+    searchInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") handleSearch();
+    });
+
+    // ── Burger mobile ──────────────────────────────────────────────
+    const burger = document.getElementById("burger");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    burger?.addEventListener("click", () => {
+        const isOpen = mobileMenu?.classList.toggle("open");
+        burger.setAttribute("aria-expanded", String(isOpen));
+        mobileMenu?.setAttribute("aria-hidden", String(!isOpen));
+    });
+</script>

@@ -1,0 +1,50 @@
+---
+interface Props {
+    label: string; // ex: "fuites de données"
+    module: string; // ex: "hibp"
+    status?: "idle" | "loading" | "done" | "error";
+}
+const { label, module, status = "idle" } = Astro.props;
+---
+
+<div
+    class={`module-card module-card--${status}`}
+    id={`card-${module}`}
+    data-module={module}
+>
+    <div class="card-label">// {label}</div>
+    <div class="card-status-row">
+        <span class="status-dot"></span>
+        <span class="status-text">{status.toUpperCase()}</span>
+    </div>
+
+    <!-- Zone de résultat injectée par JS via spyder:module-result -->
+    <div class="card-result" id={`result-${module}`}>
+        <slot />
+    </div>
+</div>
+
+<script>
+    // Écoute les événements dispatchés par TerminalStream.astro
+    document.addEventListener("spyder:module-start", (e: CustomEvent) => {
+        if (e.detail.module !== "{module}") return;
+        const card = document.getElementById("card-{module}");
+        if (card)
+            card.className = card.className.replace(
+                /module-card--\w+/,
+                "module-card--loading",
+            );
+    });
+
+    document.addEventListener("spyder:module-result", (e: CustomEvent) => {
+        if (e.detail.module !== "{module}") return;
+        const card = document.getElementById("card-{module}");
+        const result = document.getElementById("result-{module}");
+        if (card)
+            card.className = card.className.replace(
+                /module-card--\w+/,
+                "module-card--done",
+            );
+        if (result) result.textContent = JSON.stringify(e.detail.data, null, 2);
+    });
+</script>

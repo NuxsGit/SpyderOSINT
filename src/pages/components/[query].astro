@@ -1,0 +1,33 @@
+---
+import Layout from "../../layouts/Base.astro";
+import TerminalStream from "../../components/TerminalStream.astro";
+import BadgeType from "../../components/BadgeType.astro";
+import EmailResults from "../../components/modules/EmailResults.astro";
+// … autres imports
+
+export const prerender = false; // SSR
+
+const { query } = Astro.params;
+const url = new URL(Astro.request.url);
+const type = url.searchParams.get("type") ?? "unknown";
+const streamUrl = url.searchParams.get("stream") ?? "";
+---
+
+<Layout title={`Spyder — ${query}`}>
+    <section class="results-header">
+        <BadgeType type={type} />
+        <h1 class="query-display">{query}</h1>
+    </section>
+
+    <div class="results-grid">
+        <!-- Terminal live toujours visible -->
+        <TerminalStream streamUrl={streamUrl} />
+
+        <!-- Affichage conditionnel selon le type -->
+        {type === "email" && <EmailResults />}
+        {type === "ip" && <IpResults />}
+        {type === "discord_id" && <DiscordResults />}
+        {type === "username" && <UsernameResults />}
+        {type === "address" && <AddressResults />}
+    </div>
+</Layout>

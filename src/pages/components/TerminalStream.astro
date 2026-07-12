@@ -1,0 +1,125 @@
+---
+interface Props {
+    streamUrl: string;
+}
+const { streamUrl } = Astro.props;
+---
+
+<div class="terminal-wrap">
+    <div class="terminal-header">
+        <span class="t-dot t-red"></span>
+        <span class="t-dot t-yellow"></span>
+        <span class="t-dot t-green"></span>
+        <span class="t-label">SPYDER // LIVE STREAM</span>
+    </div>
+
+    <div
+        id="terminal-output"
+        class="terminal-output"
+        role="log"
+        aria-live="polite"
+    >
+        <span class="t-muted"> connexion en cours…</span>
+    </div>
+
+    <div class="terminal-footer">
+        <span id="terminal-status" class="t-status">CONNECTING</span>
+        <span id="terminal-count" class="t-count">0 événements</span>
+    </div>
+</div>
+
+<!-- On passe l'URL au script via un attribut data -->
+<div id="stream-config" data-url={streamUrl} style="display:none"></div>
+
+<script>
+    const config = document.getElementById("stream-config") as HTMLElement;
+    const output = document.getElementById("terminal-output") as HTMLElement;
+    const statusEl = document.getElementById("terminal-status") as HTMLElement;
+    const countEl = document.getElementById("terminal-count") as HTMLElement;
+
+    const streamUrl = config.dataset.url ?? "";
+    let eventCount = 0;
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function appendLine(cssClass: string, text: string) {
+        const line = document.createElement("div");
+        line.className = `t-line ${cssClass}`;
+        line.textContent = text;
+        output.appendChild(line);
+        output.scrollTop = output.scrollHeight;
+        eventCount++;
+        countEl.textContent = `${eventCount} événements`;
+    }
+
+    function setStatus(label: string, cls: string) {
+        statusEl.textContent = label;
+        statusEl.className = `t-status ${cls}`;
+    }
+
+    // ── EventSource ───────────────────────────────────────────────────────────
+    if (!streamUrl) {
+        appendLine("t-err", "[ERREUR] Aucune URL de stream fournie.");
+    } else {
+        const es = new EventSource(streamUrl);
+        setStatus("CONNECTING", "connecting");
+
+        es.addEventListener("open", () => {
+            setStatus("LIVE", "live");
+            appendLine("t-ok", "[stream:open] connexion établie");
+        });
+
+        es.addEventListener("module:start", (e: MessageEvent) => {
+            const d = JSON.parse(e.data);
+            appendLine(
+                "t-warn",
+                `[module:start] ${d.module} — ${d.label ?? "…"}`,
+            );
+            // Dispatch custom event pour que d'autres composants Astro puissent réagir
+            document.dispatchEvent(
+                new CustomEvent("spyder:module-start", { detail: d }),
+            );
+        });
+
+        es.addEventListener("module:result", (e: MessageEvent) => {
+            const d = JSON.parse(e.data);
+            appendLine("t-ok", `[module:result] ${d.module} — OK`);
+            document.dispatchEvent(
+                new CustomEvent("spyder:module-result", { detail: d }),
+            );
+        });
+
+        es.addEventListener("module:error", (e: MessageEvent) => {
+            const d = JSON.parse(e.data);
+            appendLine("t-err", `[module:error] ${d.module} — ${d.error}`);
+            document.dispatchEvent(
+                new CustomEvent("spyder:module-error", { detail: d }),
+            );
+        });
+
+        es.addEventListener("stream:done", (e: MessageEvent) => {
+            const d = JSON.parse(e.data);
+            appendLine(
+                "t-ok",
+                `[stream:done] analyse terminée — ${d.total_modules} modules`,
+            );
+            setStatus("DONE", "done");
+            es.close();
+        });
+
+        es.addEventListener("stream:error", (e: MessageEvent) => {
+            const d = JSON.parse(e.data);
+            appendLine("t-err", `[stream:error] ${d.message}`);
+            setStatus("ERROR", "error");
+            es.close();
+        });
+
+        es.onerror = () => {
+            if (es.readyState === EventSource.CLOSED) return;
+            appendLine(
+                "t-err",
+                "[ERREUR] connexion perdue, tentative de reconnexion…",
+            );
+            setStatus("RECONNECTING", "connecting");
+        };
+    }
+</script>

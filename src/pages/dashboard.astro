@@ -1,0 +1,5 @@
+const session = await getSession(Astro.cookies);
+
+if (!session) {
+    return Astro.redirect("/register");
+}
