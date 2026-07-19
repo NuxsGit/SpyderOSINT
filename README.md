@@ -10,6 +10,9 @@
 * **Visualisation des Relations :** Cartographie des liens entre les différentes entités trouvées (utilisateurs, domaines, serveurs).
 * **Rapports Exportables :** Génération de rapports d'investigation propres aux formats JSON, CSV ou HTML.
 
+
+![SpyderOSINT Preview](GitHub/img/preview1.png)
+
 ## 🛠️ Installation
 
 ```bash
