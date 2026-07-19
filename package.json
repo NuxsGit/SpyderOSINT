@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^11.0.2",
     "arctic": "^3.7.0",
     "argon2": "^0.44.0",
     "astro": "^7.0.7",
@@ -22,5 +23,8 @@
     "argon2@0.44.0": true,
     "better-sqlite3@12.11.1": true,
     "esbuild@0.28.1": true
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
   }
 }

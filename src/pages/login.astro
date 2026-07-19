@@ -110,21 +110,39 @@ const errorMessages: Record<string, string> = {
                     </div>
                     <div class="oauth-buttons">
                         <a
+                            href="/api/auth/oauth/google"
+                            class="oauth-btn oauth-google"
+                            title="Se connecter avec Google"
+                        >
+                            <img
+                                src="/icons/google.svg"
+                                alt="Google"
+                                class="oauth-icon"
+                            />
+                            <span class="oauth-label">Google</span>
+                        </a>
+                        <a
+                            href="/api/auth/oauth/github"
+                            class="oauth-btn oauth-github"
+                            title="Se connecter avec GitHub"
+                        >
+                            <img
+                                src="/icons/github.svg"
+                                alt="GitHub"
+                                class="oauth-icon"
+                            />
+                            <span class="oauth-label">GitHub</span>
+                        </a>
+                        <a
                             href="/api/auth/oauth/discord"
                             class="oauth-btn oauth-discord"
                             title="Se connecter avec Discord"
                         >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M20.317 4.492c-1.53-.742-3.17-1.297-4.93-1.684a.02.02 0 0 0-.021.01c-.141.25-.297.577-.406.835a18.75 18.75 0 0 0-5.657 0c-.11-.258-.266-.585-.407-.835a.022.022 0 0 0-.02-.01c-1.762.387-3.4.942-4.931 1.684a.02.02 0 0 0-.009.021C1.395 10.823 0 16.292 0 21.628c0 .012.01.024.021.028 1.917 1.476 3.776 2.371 5.592 2.97a.022.022 0 0 0 .023-.01c.33-.546.624-1.125.865-1.727a.02.02 0 0 0-.012-.028c-.36-.137-.704-.322-1.032-.534a.023.023 0 0 1-.002-.037c.07-.053.14-.106.206-.16a.02.02 0 0 1 .023-.002c2.163 1.06 4.507 1.06 6.635 0a.02.02 0 0 1 .023.003c.066.053.136.107.207.16a.023.023 0 0 1-.001.036c-.328.213-.673.398-1.035.536a.022.022 0 0 0-.012.028c.24.602.534 1.18.863 1.726a.022.022 0 0 0 .023.01c1.817-.6 3.678-1.495 5.594-2.969a.023.023 0 0 0 .021-.028c0-5.336-1.396-10.805-5.914-15.115a.02.02 0 0 0-.009-.021zM8.02 18.474c-1.07 0-1.95-.983-1.95-2.187 0-1.205.86-2.187 1.95-2.187 1.091 0 1.97.982 1.95 2.187 0 1.204-.86 2.187-1.95 2.187zm7.974 0c-1.07 0-1.95-.983-1.95-2.187 0-1.205.86-2.187 1.95-2.187 1.09 0 1.97.982 1.95 2.187 0 1.204-.86 2.187-1.95 2.187z"
-                                ></path>
-                            </svg>
+                            <img
+                                src="/icons/discord.svg"
+                                alt="Discord"
+                                class="oauth-icon"
+                            />
                             <span class="oauth-label">Discord</span>
                         </a>
                     </div>
@@ -542,8 +560,9 @@ const errorMessages: Record<string, string> = {
     }
 
     .oauth-buttons {
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
     }
 
     .oauth-btn {
@@ -552,7 +571,7 @@ const errorMessages: Record<string, string> = {
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 14px 24px;
+        padding: 14px 12px;
         background: var(--gray-2);
         border: 1px solid var(--border);
         border-radius: 8px;
@@ -573,12 +592,11 @@ const errorMessages: Record<string, string> = {
         transform: translateY(-2px);
     }
 
-    .oauth-btn svg {
+    .oauth-icon {
         width: 24px;
         height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
+        object-fit: contain;
     }
 
     .oauth-label {
@@ -822,6 +840,9 @@ const errorMessages: Record<string, string> = {
         .auth-title {
             font-size: 22px;
         }
+        .oauth-buttons {
+            grid-template-columns: repeat(3, 1fr);
+        }
         .footer {
             padding: 20px;
             flex-direction: column;
@@ -874,7 +895,7 @@ const errorMessages: Record<string, string> = {
     }
     lerpGlow();
 
-    // ── Formulaire de connexion ──────────────────────────────────────────────
+    // ── Formulaire de connexion ────────────────────────────────────
     const form = document.getElementById("loginForm");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
