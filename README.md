@@ -1,43 +1,20 @@
-# Astro Starter Kit: Minimal
+# SpyderOSINT 🕵️‍♂️🕷️
 
-```sh
-npm create astro@latest -- --template minimal
-```
+**SpyderOSINT** est un outil d'investigation open-source (OSINT) conçu pour automatiser la collecte d'informations, la reconnaissance et la cartographie de données à partir de sources publiques. Alliant la précision d'un crawler et la discrétion d'une araignée, il permet aux chercheurs en sécurité, analystes et passionnés d'OSINT de centraliser leurs recherches en un temps record.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Fonctionnalités Clés
 
-## 🚀 Project Structure
+* **Collecte Multi-Sources :** Scan automatique des réseaux sociaux, des moteurs de recherche et des bases de données publiques.
+* **Analyse de Noms de Domaine & IPs :** Récupération des enregistrements WHOIS, sous-domaines, et historiques DNS.
+* **Extraction d'E-mails & Fuites de Données :** Identification des adresses associées à une cible et vérification des brèches de sécurité connues.
+* **Visualisation des Relations :** Cartographie des liens entre les différentes entités trouvées (utilisateurs, domaines, serveurs).
+* **Rapports Exportables :** Génération de rapports d'investigation propres aux formats JSON, CSV ou HTML.
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🛠️ Installation
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+```bash
+# Cloner le dépôt
+git clone [https://github.com/votre-utilisateur/SpyderOSINT.git](https://github.com/votre-utilisateur/SpyderOSINT.git)
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+# Accéder au dossier
+cd SpyderOSINT
